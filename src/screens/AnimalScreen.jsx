@@ -1,8 +1,9 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function AnimalScreen() {
@@ -12,19 +13,22 @@ export default function AnimalScreen() {
 
 
     async function buscarAnimal() {
-        const animalRef = collection(db, 'fruta');
-        const buscarAnimal = query(AnimalRef, where('nome', '==', 'busca'));
+        const AnimalRef = collection(db, 'animal');
+        const buscarAnimal = query(AnimalRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarAnimal);
-
-        const listaAnimal = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaAnimal);
-        setResultado(listaAnimal);
+        const AnimalTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                AnimalTemp.push(doc.data())
+            },
+            setResultado(AnimalTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            console.log('busca', busca);
+            buscarAnimal(busca);
         }, [busca]
     )
     return (
@@ -34,6 +38,11 @@ export default function AnimalScreen() {
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Animal: {item.nome}, quantidade: {item.quantidade}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )

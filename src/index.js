@@ -6,6 +6,7 @@ import FrutaScreen from "./screens/FrutaScreen";
 import AnimalScreen from "./screens/AnimalScreen";
 import CarroScreen from "./screens/CarroScreen";
 import CorScreen from "./screens/CorScreen";
+import ProdutoScreen from "./screens/ProdutoScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ const Stack = createNativeStackNavigator();
                     <Stack.Screen name="AnimalScreen" component={AnimalScreen} />
                     <Stack.Screen name="CarroScreen" component={CarroScreen} />
                     <Stack.Screen name="CorScreen" component={CorScreen} />
+                    <Stack.Screen name="ProdutoScreen" component={ProdutoScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         );

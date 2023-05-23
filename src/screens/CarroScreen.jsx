@@ -1,8 +1,9 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function CarroScreen() {
@@ -11,29 +12,37 @@ export default function CarroScreen() {
 
 
 
-    async function buscarCarro() {
+    async function buscarCarros() {
         const CarroRef = collection(db, 'carro');
-        const buscarCarro = query(carroRef, where('nome', '==', 'busca'));
+        const buscarCarro = query(CarroRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarCarro);
-
-        const listaCarro = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaCarro);
-        setResultado(listaCarro);
+        const carrosTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                carrosTemp.push(doc.data())
+            },
+            setResultado(carrosTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            console.log('busca', busca);
+            buscarCarros(busca);
         }, [busca]
     )
     return (
         <View>
-            <Text>Carro Screen</Text>
+            <Text>Carros Screen</Text>
             <TextInput
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Carro: {item.nome}, preço: {item.preco}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )

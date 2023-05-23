@@ -1,43 +1,48 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function ProdutoScreen() {
-    const [nome, setNome] = useState('');
+    const [busca, setBusca] = useState('');
     const [resultado, setResultado] = useState([]);
 
 
-    async function buscarProdutos(nome = null) {
-        try {
-            if(!nome) return
-            const produtoRef = collection(db, 'produtos');
-        const buscarProduto = query(produtoRef, where('nome', '==', busca));
-        const resultadoSnapshot = await getDocs(buscarProduto);
 
-        const listaProdutos = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaProdutos);
-        setResultado(listaProdutos);   
-        } catch (error) {
-            console.log(error);
-        }
+    async function buscarProduto() {
+        const ProdutoRef = collection(db, 'produto');
+        const buscarProduto = query(ProdutoRef, where('nome', '==', busca));
+        const resultadoSnapshot = await getDocs(buscarProduto);
+        const produtoTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                produtoTemp.push(doc.data())
+            },
+            setResultado(produtoTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            setBusca('');
+            buscarProduto(busca);
         }, [busca]
     )
     return (
         <View>
-            <Text>Home Screen</Text>
+            <Text>Produto Screen</Text>
             <TextInput
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Produto: {item.nome}, preço: {item.preco}, quantidade {item.quantidade}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )

@@ -1,8 +1,9 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function CorScreen() {
@@ -13,18 +14,21 @@ export default function CorScreen() {
 
     async function buscarCor() {
         const CorRef = collection(db, 'cor');
-        const buscarCor = query(corRef, where('nome', '==', 'busca'));
+        const buscarCor = query(CorRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarCor);
-
-        const listaCor = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaCor);
-        setResultado(listaCor);
+        const coresTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                coresTemp.push(doc.data())
+            },
+            setResultado(coresTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            console.log('busca', busca);
+            buscarCor(busca);
         }, [busca]
     )
     return (
@@ -34,6 +38,11 @@ export default function CorScreen() {
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Cor: {item.nome}, preço: {item.preco}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )

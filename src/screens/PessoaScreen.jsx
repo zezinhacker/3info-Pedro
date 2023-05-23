@@ -1,8 +1,9 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function PessoaScreen() {
@@ -12,19 +13,22 @@ export default function PessoaScreen() {
 
 
     async function buscarPessoa() {
-        const pessoaRef = collection(db, 'pessoa');
-        const buscarPessoa = query(oessoaRef, where('nome', '==', 'busca'));
+        const PessoaRef = collection(db, 'pessoa');
+        const buscarPessoa = query(PessoaRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarPessoa);
-
-        const listaPessoa = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaPessoa);
-        setResultado(listaPessoa);
+        const PessoaTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                PessoaTemp.push(doc.data())
+            },
+            setResultado(PessoaTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            console.log('busca', busca);
+            buscarPessoa(busca);
         }, [busca]
     )
     return (
@@ -34,6 +38,11 @@ export default function PessoaScreen() {
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Pessoa: {item.nome}, idade: {item.idade}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )

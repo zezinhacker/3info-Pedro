@@ -1,8 +1,9 @@
-import { collection } from "firebase/firestore";
+import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
 import { View } from "react-native";
+import { FlatList } from "react-native-web";
 
 
 export default function FrutaScreen() {
@@ -13,18 +14,21 @@ export default function FrutaScreen() {
 
     async function buscarFruta() {
         const FrutaRef = collection(db, 'fruta');
-        const buscarFruta = query(frutaRef, where('nome', '==', 'busca'));
+        const buscarFruta = query(FrutaRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarFruta);
-
-        const listaFruta = resultadoSnapshot.docs.map(doc => doc.data());
-        console.log(listaFruta);
-        setResultado(listaFruta);
+        const frutaTemp = [];
+        resultadoSnapshot.forEach(
+            (doc) => {
+                frutaTemp.push(doc.data())
+            },
+            setResultado(frutaTemp)
+        );
 
     }
 
     useEffect(
         () => {
-            console.log('busca', busca);
+            buscarFruta(busca);
         }, [busca]
     )
     return (
@@ -34,6 +38,11 @@ export default function FrutaScreen() {
             label="Faça sua Busca"
             value={busca}
             onChangeText={setBusca}
+            />
+            <FlatList
+                data={resultado}
+                renderItem={({item}) => <Text>Fruta: {item.nome}, quantidade: {item.quantidade}</Text>}
+                keyExtractor={(item) => item.id}
             />
         </View>
     )
