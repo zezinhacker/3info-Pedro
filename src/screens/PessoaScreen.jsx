@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
@@ -13,7 +13,7 @@ export default function PessoaScreen() {
 
 
     async function buscarPessoa() {
-        const PessoaRef = collection(db, 'pessoa');
+        const PessoaRef = collection(db, 'pessoas');
         const buscarPessoa = query(PessoaRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarPessoa);
         const PessoaTemp = [];

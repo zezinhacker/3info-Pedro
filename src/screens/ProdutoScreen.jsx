@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native-paper";
 import { db } from "../config/firebase";
@@ -13,7 +13,7 @@ export default function ProdutoScreen() {
 
 
     async function buscarProduto() {
-        const ProdutoRef = collection(db, 'produto');
+        const ProdutoRef = collection(db, 'produtos');
         const buscarProduto = query(ProdutoRef, where('nome', '==', busca));
         const resultadoSnapshot = await getDocs(buscarProduto);
         const produtoTemp = [];
